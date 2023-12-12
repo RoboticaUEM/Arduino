@@ -76,10 +76,10 @@ void MotorEncoderOnePin::runTo(long target, long vel, bool forever) {
   Serial.println(this->target);
   speed = vel;
   newPulse = false;
-  pwm = map(vel, 3000, 6000, 255, 100);
+  pwm = map(vel, configMotor.PulseMaxVelocidad_Micros, configMotor.PulseMinVelocidad_Micros, 255, 100);
+  chekPwmLimits();
   Serial.print("Set pwm: ");
   Serial.println(pwm);
-  chekPwmLimits();
   if (target > posionEnc)
     forwardPwd(pwm);
   else
@@ -93,7 +93,7 @@ void MotorEncoderOnePin::runTo(long target, long vel, bool forever) {
     Es importante saber, que no inicia el movimiento, solo modifica el target.
     Por supuesto, si esta en "forever" no modifica el target.
 */
-bool MotorEncoderOnePin::runTo(long incTarget){
+bool MotorEncoderOnePin::newRunTo(long incTarget){
   if (target != 2147483647 && target != -2147483647)
     target += incTarget;
   return (estadoMotor != estadoStop);
@@ -122,7 +122,7 @@ bool MotorEncoderOnePin::run() {
       pwm--;
     newPulse = false;
   } else {
-    if (micros() - timePass > 10000) pwm++;
+    if (micros() - timePass > configMotor.EsperaMaxMotorParado_Micros) pwm++;
   }
   chekPwmLimits();
   analogWrite(pinENA, pwm);
@@ -136,12 +136,15 @@ void MotorEncoderOnePin::setLimitsPwm(int min, int max) {
 }
 
 void MotorEncoderOnePin::pulso() {
+  static long incremento = 0;
   timeNow = micros();
   delayPulse = timeNow - timePass;
+  if(delayPulse < configMotor.DescartarPulse_Micros) return;
   newPulse = true;
   timePass = timeNow;
-  if (estadoMotor == estadoForward) posionEnc++;
-  if (estadoMotor == estadoBackward) posionEnc--;
+  if (estadoMotor == estadoForward) incremento = +1;
+  if (estadoMotor == estadoBackward) incremento = -1;
+  posionEnc += incremento;
 }
 
 void MotorEncoderOnePin::chekPwmLimits() {
