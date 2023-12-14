@@ -31,10 +31,9 @@ public:
     posionEnc = p;
   };
   void pulso();
-  void runSpeed();
   void stop();
   void runTo(long target, long vel, bool forever = false);
-  bool newRunTo(long incTarget) ;
+  bool newRunTo(long incTarget);
   bool run();
   void setLimitsPwm(int min, int max);
   void setRpV(int rpv) {
@@ -43,8 +42,17 @@ public:
   void setConfigMotor(TConfigMotor cfgM) {
     configMotor = cfgM;
   };
+  TEstadoMotor getEstado() {
+    return estadoMotor;
+  };
+  void setSpeed(long s) {
+    speed = s;
+  };
+  int getPwm() {
+    return pwm;
+  };
 
- private:
+private:
   uint8_t pinENA;
   uint8_t pinIN1;
   uint8_t pinIN2;

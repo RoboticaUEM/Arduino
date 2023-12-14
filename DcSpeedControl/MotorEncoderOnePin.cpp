@@ -72,14 +72,10 @@ void MotorEncoderOnePin::runTo(long target, long vel, bool forever) {
     else target = -2147483647;
   } 
   this->target = target;
-  Serial.print("Set target: ");
-  Serial.println(this->target);
   speed = vel;
   newPulse = false;
   pwm = map(vel, configMotor.PulseMaxVelocidad_Micros, configMotor.PulseMinVelocidad_Micros, 255, 100);
   chekPwmLimits();
-  Serial.print("Set pwm: ");
-  Serial.println(pwm);
   if (target > posionEnc)
     forwardPwd(pwm);
   else
